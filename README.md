@@ -4,15 +4,14 @@ A project for CSC-207.
 
 Authors:
 
-* Your Name Here
+* Sarah Deschamps
 * Samuel A. Rebelsky (starter code)
 
 ---
 
 Overview:
 
-PLEASE PROVIDE AN OVERVIEW OF THE PROJECT FOR THOSE WHO MIGHT NOT
-OTHERWISE UNDERSTAND IT.
+This project provides a matrix data structure. A matrix is a 2x2 array, or an array of arrays. 
 
 ---
 
@@ -20,6 +19,6 @@ Citations:
 
 ---
 
-This code may be found at <https://github.com/USERID/mp-matrices-maven>. 
+This code may be found at <https://github.com/sidesch/mp-matrices-maven>. 
 
 The original code may be found at <https://github.com/Grinnell-CSC207/mp-matrices-maven>.
