@@ -3,7 +3,7 @@ package edu.grinnell.csc207.util;
 /**
  * An implementation of two-dimensional matrices.
  *
- * @author Your Name Here
+ * @author Sarah
  * @author Samuel A. Rebelsky
  *
  * @param <T>
@@ -13,6 +13,26 @@ public class MatrixV0<T> implements Matrix<T> {
   // +--------+------------------------------------------------------
   // | Fields |
   // +--------+
+
+  /**
+   * The matrix containing the data.
+   */
+  private T[][] contents;
+
+  /**
+   * The default value to fill in the array.
+   */
+  private T def;
+
+  /**
+   * The width of the array.
+   */
+  private int wid;
+
+  /**
+   * The height of the array.
+   */
+  private int ht;
 
   // +--------------+------------------------------------------------
   // | Constructors |
@@ -32,8 +52,18 @@ public class MatrixV0<T> implements Matrix<T> {
    * @throws NegativeArraySizeException
    *   If either the width or height are negative.
    */
+  @SuppressWarnings("unchecked")
   public MatrixV0(int width, int height, T def) {
-    // STUB
+    this.contents = (T[][]) new Object[height][];
+    for (int i = 0; i < height; i++) {
+      this.contents[i] = (T[]) new Object[width];
+      for (int j = 0; j < width; j++) {
+        this.contents[i][j] = def;
+      } // for
+    } // for
+    this.def = def;
+    this.wid = width;
+    this.ht = height;
   } // MatrixV0(int, int, T)
 
   /**
@@ -70,7 +100,10 @@ public class MatrixV0<T> implements Matrix<T> {
    *   If either the row or column is out of reasonable bounds.
    */
   public T get(int row, int col) {
-    return null;        // STUB
+    if (row >= this.ht || col >= this.wid) {
+      throw new IndexOutOfBoundsException();
+    } // if
+    return this.contents[row][col];
   } // get(int, int)
 
   /**
@@ -87,7 +120,10 @@ public class MatrixV0<T> implements Matrix<T> {
    *   If either the row or column is out of reasonable bounds.
    */
   public void set(int row, int col, T val) {
-    // STUB
+    if (row > this.ht || col > this.wid) {
+      throw new IndexOutOfBoundsException();
+    } // if
+    this.contents[row][col] = val;
   } // set(int, int, T)
 
   /**
@@ -96,7 +132,7 @@ public class MatrixV0<T> implements Matrix<T> {
    * @return the number of rows.
    */
   public int height() {
-    return 5;   // STUB
+    return this.ht;
   } // height()
 
   /**
@@ -105,7 +141,7 @@ public class MatrixV0<T> implements Matrix<T> {
    * @return the number of columns.
    */
   public int width() {
-    return 3;   // STUB
+    return this.wid;
   } // width()
 
   /**
@@ -117,8 +153,13 @@ public class MatrixV0<T> implements Matrix<T> {
    * @throws IndexOutOfBoundsException
    *   If the row is negative or greater than the height.
    */
+  @SuppressWarnings("unchecked")
   public void insertRow(int row) {
-    // STUB
+    T[] newRow = (T[]) new Object[this.wid];
+    for (int i = 0; i < this.wid; i++) {
+      newRow[i] = this.def;
+    } // for
+    this.insertRowHelper(row, newRow);
   } // insertRow(int)
 
   /**
@@ -135,7 +176,10 @@ public class MatrixV0<T> implements Matrix<T> {
    *   If the size of vals is not the same as the width of the matrix.
    */
   public void insertRow(int row, T[] vals) throws ArraySizeException {
-    // STUB
+    if (vals.length != this.wid) {
+      throw new ArraySizeException();
+    } // if
+    this.insertRowHelper(row, vals);
   } // insertRow(int, T[])
 
   /**
@@ -147,8 +191,13 @@ public class MatrixV0<T> implements Matrix<T> {
    * @throws IndexOutOfBoundsException
    *   If the column is negative or greater than the width.
    */
+  @SuppressWarnings("unchecked")
   public void insertCol(int col) {
-    // STUB
+    T[] newCol = (T[]) new Object[this.ht];
+    for (int i = 0; i < this.ht; i++) {
+      newCol[i] = this.def;
+    } // for
+    this.insertRowHelper(col, newCol);
   } // insertCol(int)
 
   /**
@@ -165,7 +214,10 @@ public class MatrixV0<T> implements Matrix<T> {
    *   If the size of vals is not the same as the height of the matrix.
    */
   public void insertCol(int col, T[] vals) throws ArraySizeException {
-    // STUB
+    if (vals.length != this.ht) {
+      throw new ArraySizeException();
+    } // if
+    this.insertColHelper(col, vals);
   } // insertCol(int, T[])
 
   /**
@@ -249,7 +301,7 @@ public class MatrixV0<T> implements Matrix<T> {
    *
    * @return a copy of the matrix.
    */
-  public Matrix clone() {
+  public Matrix<T> clone() {
     return this;        // STUB
   } // clone()
 
@@ -288,4 +340,50 @@ public class MatrixV0<T> implements Matrix<T> {
     } // for row
     return code;
   } // hashCode()
+
+  /**
+   * Inserts a row into the matrix, assuming values array satisfies preconditions.
+   * @param row the index to insert the row into.
+   * @param values the values to be inserted into the row.
+   */
+  private void insertRowHelper(int row, T[] values) {
+    if (row < 0 || row > this.ht) {
+      throw new IndexOutOfBoundsException();
+    } // if
+    if (this.ht + 1 >= this.contents.length) {
+      this.contents = java.util.Arrays.copyOf(this.contents, this.contents.length * 2);
+    } // if
+    for (int i = this.ht - 1; i >= row; i--) {
+      this.contents[i + 1] = this.contents[i];
+    } // for
+    for (int i = 0; i < this.wid; i++) {
+      this.contents[row][i] = values[i];
+    } // for
+    this.ht++;
+  } // insertRowHelper(int, T[])
+
+  /**
+   * Inserts a column into the matrix, assuming values array satisfies preconditions.
+   * @param col the index to insert the column into.
+   * @param values the values to be inserted into the column.
+   */
+  private void insertColHelper(int col, T[] values) {
+    if (col < 0 || col > this.wid) {
+      throw new IndexOutOfBoundsException();
+    } // if
+    if (this.wid + 1 >= this.contents[0].length) { // fishy, contents[0] may not exist
+      for (int i = 0; i < this.contents.length; i++) {
+        this.contents[i] = java.util.Arrays.copyOf(this.contents[i], this.contents[i].length * 2);
+      } // for
+    } // if
+    for (int i = 0; i < this.ht; i++) {
+      for (int j = this.wid - 1; j >= col; j--) {
+        this.contents[i][j + 1] = this.contents[i][j];
+      } // for
+    } // for
+    for (int i = 0; i < this.ht; i++) {
+      this.contents[i][col] = values[i];
+    } // for
+    this.wid++;
+  } // insertColHelper(int, T[])
 } // class MatrixV0
