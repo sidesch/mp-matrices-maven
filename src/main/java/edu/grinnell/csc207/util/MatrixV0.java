@@ -34,11 +34,6 @@ public class MatrixV0<T> implements Matrix<T> {
    */
   private int ht;
 
-  /**
-   * The width capacity of the array.
-   */
-  private int widCap;
-
   // +--------------+------------------------------------------------
   // | Constructors |
   // +--------------+
@@ -69,7 +64,6 @@ public class MatrixV0<T> implements Matrix<T> {
     this.deflt = def;
     this.wid = width;
     this.ht = height;
-    this.widCap = width;
   } // MatrixV0(int, int, T)
 
   /**
@@ -126,7 +120,7 @@ public class MatrixV0<T> implements Matrix<T> {
    *   If either the row or column is out of reasonable bounds.
    */
   public void set(int row, int col, T val) {
-    if (row > this.ht || col > this.wid) {
+    if (row >= this.ht || col >= this.wid) {
       throw new IndexOutOfBoundsException();
     } // if
     this.contents[row][col] = val;
@@ -258,7 +252,7 @@ public class MatrixV0<T> implements Matrix<T> {
     if (col < 0 || col > this.wid) {
       throw new IndexOutOfBoundsException();
     } // if
-    for (int i = 0; i < this.ht - 1; i++) {
+    for (int i = 0; i < this.ht; i++) {
       for (int j = col; j < this.wid - 1; j++) {
         this.contents[i][j] = this.contents[i][j + 1];
       } // for
@@ -359,19 +353,20 @@ public class MatrixV0<T> implements Matrix<T> {
    * @return true if the other object is a matrix with the same width,
    * height, and equal elements; false otherwise.
    */
-  @SuppressWarnings("unchecked")
   public boolean equals(Object other) {
-    if (other instanceof MatrixV0) {
-      if (this.wid == ((MatrixV0<T>) other).width() && this.ht == ((MatrixV0<T>) other).height()) {
-        for (int i = 0; i < this.ht; i++) {
-          for (int j = 0; j < this.wid; j++) {
-            if (this.contents[i][j] != ((MatrixV0<T>) other).get(i, j)) {
-              return false;
-            } // if
-          } // for
-        } // for
-        return true;
+    if (other instanceof Matrix) {
+      Matrix otherMatrix = (Matrix) other;
+      if (otherMatrix.width() != this.wid || otherMatrix.height() != this.ht) {
+        return false;
       } // if
+      for (int r = 0; r < this.ht; r++) {
+        for (int c = 0; c < this.wid; c++) {
+          if (this.get(r, c) != otherMatrix.get(r, c)) {
+            return false;
+          } // if
+        } // for
+      } // for
+      return true;
     } // if
     return false;
   } // equals(Object)
@@ -405,15 +400,15 @@ public class MatrixV0<T> implements Matrix<T> {
    * @param values the values to be inserted into the row.
    * @throws IndexOutOfBoundsException if the indeces are out of bounds.
    */
+  @SuppressWarnings("unchecked")
   private void insertRowHelper(int row, T[] values) {
     if (row < 0 || row > this.ht) {
       throw new IndexOutOfBoundsException();
     } // if
-    if (this.ht + 1 >= this.contents.length) {
-      this.contents = java.util.Arrays.copyOf(this.contents, this.contents.length * 2);
-    } // if
+    this.contents = java.util.Arrays.copyOf(this.contents, this.contents.length + 1);
+    this.contents[this.ht] = (T[]) new Object[this.wid];
     for (int r = this.ht - 1; r >= row; r--) {
-      this.contents[r + 1] = java.util.Arrays.copyOf(this.contents[r], this.contents[r].length);
+      this.contents[r + 1] = this.contents[r].clone();
     } // for
     for (int c = 0; c < this.wid; c++) {
       this.contents[row][c] = values[c];
@@ -431,19 +426,19 @@ public class MatrixV0<T> implements Matrix<T> {
     if (col < 0 || col > this.wid) {
       throw new IndexOutOfBoundsException();
     } // if
-    if (this.wid + 1 >= this.widCap) {
-      for (int i = 0; i < this.contents.length; i++) {
-        this.contents[i] = java.util.Arrays.copyOf(this.contents[i], this.contents[i].length * 2);
-      } // for
-      this.widCap *= 2;
-    } // if
-    for (int i = 0; i < this.ht; i++) {
-      for (int j = this.wid - 1; j >= col; j--) {
-        this.contents[i][j + 1] = this.contents[i][j];
+    for (int r = 0; r < this.ht; r++) {
+      this.contents[r] = java.util.Arrays.copyOf(this.contents[r], this.wid + 1);
+      for (int c = this.wid - 1; c >= col; c--) {
+        this.contents[r][c + 1] = this.contents[r][c];
       } // for
     } // for
-    for (int i = 0; i < this.ht; i++) {
-      this.contents[i][col] = values[i];
+    // for (int r = 0; r < this.ht; r++) {
+    //   for (int c = this.wid - 1; c >= col; c--) {
+    //     this.contents[r][c + 1] = this.contents[r][c];
+    //   } // for
+    // } // for
+    for (int r = 0; r < this.ht; r++) {
+      this.contents[r][col] = values[r];
     } // for
     this.wid++;
   } // insertColHelper(int, T[])
