@@ -16,7 +16,8 @@ This project provides a matrix data structure. A matrix is a 2x2 array, or an ar
 ---
 
 Citations:
-
+Some code was taken from Sam Rebelsky, particularly the code for equals
+This website helped me learn about cloning arrays: https://www.baeldung.com/java-copy-list-to-another
 ---
 
 This code may be found at <https://github.com/sidesch/mp-matrices-maven>. 
